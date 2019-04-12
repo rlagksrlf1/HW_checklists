@@ -50,7 +50,7 @@ class ChecklistViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView,
                             numberOfRowsInSection section: Int) -> Int {
-        return 5
+        return items.count
     }
 /*
     override func tableView(_ tableView: UITableView,
@@ -101,6 +101,17 @@ class ChecklistViewController: UITableViewController {
         return cell
     }
     
+    override func tableView(_ tableView: UITableView,
+                            didSelectRowAt indexPath: IndexPath) {
+        
+        if let cell = tableView.cellForRow(at: indexPath) {
+            let item = items[indexPath.row]
+            item.toggleChecked()
+            configureCheckmark(for: cell, with: item)
+        }
+        tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
     func configureCheckmark(for cell: UITableViewCell,
                             with item: ChecklistItem) {
         if item.checked {
@@ -116,18 +127,27 @@ class ChecklistViewController: UITableViewController {
         label.text = item.text
     }
     
-    override func tableView(_ tableView: UITableView,
-                            didSelectRowAt indexPath: IndexPath) {
+    @IBAction func addItem() {
+        let newRowIndex = items.count
         
-        if let cell = tableView.cellForRow(at: indexPath) {
-            let item = items[indexPath.row]
-            item.toggleChecked()
-            configureCheckmark(for: cell, with: item)
-        }
-        tableView.deselectRow(at: indexPath, animated: true)
+        let item = ChecklistItem()
+        item.text = "I am a new row"
+        item.checked = false
+        items.append(item)
+        
+        let indexPath = IndexPath(row: newRowIndex, section: 0)
+        let indexPaths = [indexPath]
+        tableView.insertRows(at: indexPaths, with: .automatic)
+        
     }
     
-    @IBAction func addItem() {
+    override func tableView(_ tableView: UITableView,
+                            commit editingStyle: UITableViewCell.EditingStyle,
+                            forRowAt indexPath: IndexPath) {
+        items.remove(at: indexPath.row)
+        
+        let indexPaths = [indexPath]
+        tableView.deleteRows(at: indexPaths, with: .automatic)
     }
 
 }
