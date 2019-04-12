@@ -126,5 +126,9 @@ class ChecklistViewController: UITableViewController {
         }
         tableView.deselectRow(at: indexPath, animated: true)
     }
+    
+    @IBAction func addItem() {
+    }
+
 }
 
