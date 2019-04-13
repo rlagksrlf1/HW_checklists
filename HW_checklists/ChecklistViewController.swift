@@ -11,10 +11,9 @@ import UIKit
 class ChecklistViewController: UITableViewController,ItemDetailViewControllerDelegate {
 
     var items: [ChecklistItem]
-    
     required init?(coder aDecoder: NSCoder) {
         items = [ChecklistItem]()
-        
+        /*
         let row0item = ChecklistItem()
         row0item.text = "Walk the dog"
         row0item.checked = false
@@ -40,9 +39,47 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
         row4item.checked = true
         items.append(row4item)
         
-        super.init(coder: aDecoder)
         
+        print("Documents folder is \(documentsDirectory())")
+        print(" Data file is \(dataFilePath())")
+        */
+        super.init(coder: aDecoder)
+        loadChecklistItems()
     }
+    /* File I/O */
+    func documentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
+    }
+    
+    func dataFilePath() -> URL {
+        return documentsDirectory().appendingPathComponent("Checklists.plist")
+    }
+    
+    /* Saving the file */
+    func saveChecklistItems() {
+        let encoder = PropertyListEncoder()
+        do {
+            let data = try encoder.encode(items)
+            try data.write(to: dataFilePath(),options: Data.WritingOptions.atomic)
+        } catch {
+            print("Error encoding item array: \(error.localizedDescription)")
+        }
+    }
+    
+    /* Loading the file */
+    func loadChecklistItems() {
+        let path = dataFilePath()
+        if let data = try? Data(contentsOf: path) {
+            let decoder = PropertyListDecoder()
+            do {
+                items = try decoder.decode([ChecklistItem].self, from: data)
+            } catch {
+                print("Error decoding item array: \(error.localizedDescription)")
+            }
+        }
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
@@ -110,6 +147,9 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
             configureCheckmark(for: cell, with: item)
         }
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        /* Save data */
+        saveChecklistItems()
     }
     
     func configureCheckmark(for cell: UITableViewCell,
@@ -129,6 +169,7 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
         label.text = item.text
     }
     
+    /* add Row */
     func itemDetailViewController(_ controller: ItemDetailViewController, didFinishAdding item: ChecklistItem) {
         let newRowIndex = items.count
         items.append(item)
@@ -138,8 +179,11 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
         tableView.insertRows(at: indexPaths, with: .automatic)
         
         navigationController?.popViewController(animated:true)
+        /* Save data */
+        saveChecklistItems()
     }
     
+    /* delete Row */
     override func tableView(_ tableView: UITableView,
                             commit editingStyle: UITableViewCell.EditingStyle,
                             forRowAt indexPath: IndexPath) {
@@ -147,6 +191,8 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
         
         let indexPaths = [indexPath]
         tableView.deleteRows(at: indexPaths, with: .automatic)
+        /* Save data */
+        saveChecklistItems()
     }
     
     func itemDetailViewControllerDidCancel(_ controller: ItemDetailViewController) {
@@ -161,6 +207,8 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
             }
         }
         navigationController?.popViewController(animated:true)
+        /* Save data */
+        saveChecklistItems()
     }
     
     // MARK:- Navigation
@@ -177,6 +225,9 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
             }
         }
     }
+
+
+    
 
 }
 
