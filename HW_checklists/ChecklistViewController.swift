@@ -10,7 +10,18 @@ import UIKit
 
 class ChecklistViewController: UITableViewController,ItemDetailViewControllerDelegate {
 
-    var items: [ChecklistItem]
+    var items = [ChecklistItem]()
+    var checklist: Checklist!   /* From AllListViewController */
+    
+    /* Initialization */
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        title = checklist.name /* Got the information From AllListViewController */
+        
+        /* Loading current file */
+        loadChecklistItems()
+    }
+    /*
     required init?(coder aDecoder: NSCoder) {
         items = [ChecklistItem]()
         /*
@@ -43,9 +54,8 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
         print("Documents folder is \(documentsDirectory())")
         print(" Data file is \(dataFilePath())")
         */
-        super.init(coder: aDecoder)
-        loadChecklistItems()
-    }
+ 
+    }*/
     /* File I/O */
     func documentsDirectory() -> URL {
         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
@@ -80,10 +90,7 @@ class ChecklistViewController: UITableViewController,ItemDetailViewControllerDel
         }
     }
     
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
-    }
+
 
     override func tableView(_ tableView: UITableView,
                             numberOfRowsInSection section: Int) -> Int {
