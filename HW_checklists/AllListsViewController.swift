@@ -42,6 +42,7 @@ class AllListsViewController: UITableViewController {
         
         // Configure the cell...
         cell.textLabel!.text="List\(indexPath.row)"
+        
         return cell
     }
     
